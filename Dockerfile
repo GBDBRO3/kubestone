@@ -21,7 +21,13 @@ COPY main.go main.go
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on make manager
 
 # Create final image
-FROM alpine:3.10
+FROM alpine:3.13.2
+RUN apk update && apk upgrade && \
+addgroup -S kubestone && adduser -S kubestone -G kubestone && \
+mkdir /kubestone && \
+chown -R kubestone:kubestone /kubestone && \
+chmod -R g=u /kubestone
 WORKDIR /
 COPY --from=builder /workspace/bin/manager .
+USER 1001
 ENTRYPOINT ["/manager"]
